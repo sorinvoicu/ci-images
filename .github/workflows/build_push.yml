@@ -1,0 +1,150 @@
+---
+name: Build and Publish Image
+
+env:
+  REGISTRY: ghcr.io
+  CRAN_PM: https://packagemanager.posit.co/cran/__linux__
+  OS_NAME: ubuntu
+  OS_VERSION: jammy
+
+on:
+  workflow_dispatch:
+    inputs:
+      r_version:
+        description: R Version
+        required: true
+        type: choice
+        default: "4.3.2"
+        options:
+          - "4.3.2"
+          - "latest"
+      quarto_version:
+        description: Quarto version
+        required: true
+        type: choice
+        default: "1.3.450"
+        options:
+          - "1.3.450"
+          - "latest"
+      pandoc_version:
+        description: Pandoc version
+        required: true
+        type: choice
+        default: "2.9.2.1"
+        options:
+          - "2.9.2.1"
+          - "latest"
+      cran_snapshot_date:
+        description: CRAN packages snapshot date (YYYY-MM-DD)
+        required: true
+        default: "2024-01-12"
+        type: string
+      custom_tag:
+        description: Custom image tag
+        required: false
+        default: ""
+        type: string
+
+jobs:
+  build_publish:
+    name: Build and Publish Image
+    runs-on: ubuntu-latest
+
+    permissions:
+      packages: write
+      security-events: write
+
+    steps:
+      - name: Checkout project ⬇️
+        uses: actions/checkout@v4
+
+      - name: Checkout Rocker project ⬇️
+        uses: actions/checkout@v4
+        with:
+          repository: rocker-org/rocker-versioned2
+          path: ./rocker_scripts
+          ref: master
+
+      - name: Set up Docker Buildx 📐
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+
+      - name: Log in to the container registry 🗝️
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set build variables ✏️
+        id: build_vars
+        shell: bash
+        run: |
+          echo "IMAGE_DATE_TAG=$(date +%Y.%m.%d)" >> $GITHUB_OUTPUT
+          CRAN_DATE=$(echo ${{ github.event.inputs.cran_snapshot_date }} | sed 's/-/\./g')
+          IMAGE_NAME=${{ env.REGISTRY }}/${{ github.repository_owner }}/r_${{ github.event.inputs.r_version }}_cran_${CRAN_DATE}
+          echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_OUTPUT
+
+      - name: Docker metadata 🐋
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ steps.build_vars.outputs.IMAGE_NAME }}
+          tags: |
+            ${{ steps.build_vars.outputs.IMAGE_DATE_TAG }}
+            ${{ github.event.inputs.custom_tag }}
+            type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
+          labels: |
+            org.opencontainers.image.description=Image used in CI workflows by the Boehringer-Ingelheim organisation
+            org.opencontainers.image.vendor=Boehringer-Ingelheim
+
+      - name: Build and push image 🛠️
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          platforms: linux/amd64
+          cache-from: type=registry,ref=${{ steps.build_vars.outputs.IMAGE_NAME }}:cache
+          cache-to: type=registry,ref=${{ steps.build_vars.outputs.IMAGE_NAME }}:cache,mode=min
+          build-args: |
+            R_VERSION=${{ github.event.inputs.r_version }}
+            CRAN=${{ env.CRAN_PM }}/${{ env.OS_VERSION }}/${{ github.event.inputs.cran_snapshot_date }}
+            OS_NAME=${{ env.OS_NAME }}
+            OS_VERSION=${{ env.OS_VERSION }}
+            PANDOC_VERSION=${{ github.event.inputs.pandoc_version }}
+            QUARTO_VERSION=${{ github.event.inputs.quarto_version }}
+
+      - name: Generate R pkg list ✏️
+        shell: bash
+        run: |
+          docker run -v ${PWD}:/app ${{ steps.build_vars.outputs.IMAGE_NAME }}:${{ steps.build_vars.outputs.IMAGE_DATE_TAG }} \
+          R -q -e '
+          rbind(c("|-", "-|"),
+          installed.packages()[, c("Package", "Version")]) |>
+          write.table(file = "/app/r-pkg-list.csv", row.names = FALSE, quote = FALSE, sep="|")'
+          cat r-pkg-list.csv >> $GITHUB_STEP_SUMMARY
+
+      - name: Run Trivy vulnerability scanner ☢️
+        if: github.ref_name == 'main'
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.build_vars.outputs.IMAGE_NAME }}:${{ steps.build_vars.outputs.IMAGE_DATE_TAG }}
+          exit-code: 0
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH,MEDIUM"
+          format: "sarif"
+          output: "trivy-results.sarif"
+          timeout: 30m0s
+
+      - name: Upload Trivy scan results to GitHub Security tab 📜
+        if: github.ref_name == 'main'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "trivy-results.sarif"
