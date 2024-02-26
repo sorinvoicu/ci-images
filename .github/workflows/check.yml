@@ -6,10 +6,10 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "**/*.sh"
-      - ".github/workflows/*.yml"
-      - "Dockerfile"
+    # paths:
+    #   - "**/*.sh"
+    #   - ".github/workflows/*.yml"
+    #   - "Dockerfile"
 
 jobs:
   check:
@@ -18,13 +18,26 @@ jobs:
     steps:
       - name: Checkout project ⬇️
         uses: actions/checkout@v4
-
-      - name: Run ShellCheck 🐚
-        uses: ludeeus/action-shellcheck@master
-        env:
-          SHELLCHECK_OPTS: -e SC2086
-
-      - name: Lint Dockerfile 🐋
-        uses: hadolint/hadolint-action@master
         with:
-          dockerfile: Dockerfile
+          fetch-depth: 0
+
+      # - name: Run ShellCheck 🐚
+      #   uses: ludeeus/action-shellcheck@master
+      #   env:
+      #     SHELLCHECK_OPTS: -e SC2086
+
+      # - name: Lint Dockerfile 🐋
+      #   uses: hadolint/hadolint-action@master
+      #   with:
+      #     dockerfile: Dockerfile
+
+      - name: Super-linter
+        uses: github/super-linter/slim@v6.2.0
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: main
+          VALIDATE_R: true
+          VALIDATE_YAML: true
+          VALIDATE_BASH: true
+          VALIDATE_DOCKERFILE_HADOLINT: true
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
