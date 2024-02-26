@@ -6,10 +6,6 @@ on:
   pull_request:
     branches:
       - main
-    # paths:
-    #   - "**/*.sh"
-    #   - ".github/workflows/*.yml"
-    #   - "Dockerfile"
 
 jobs:
   check:
@@ -27,16 +23,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Run ShellCheck 🐚
-      #   uses: ludeeus/action-shellcheck@master
-      #   env:
-      #     SHELLCHECK_OPTS: -e SC2086
-
-      # - name: Lint Dockerfile 🐋
-      #   uses: hadolint/hadolint-action@master
-      #   with:
-      #     dockerfile: Dockerfile
-
       - name: Super-linter
         uses: super-linter/super-linter/slim@v6
         env:
@@ -47,5 +33,4 @@ jobs:
           VALIDATE_BASH: true
           VALIDATE_DOCKERFILE_HADOLINT: true
           VALIDATE_MARKDOWN: true
-          # LOG_LEVEL: WARN
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
