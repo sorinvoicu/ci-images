@@ -47,5 +47,5 @@ jobs:
           VALIDATE_BASH: true
           VALIDATE_DOCKERFILE_HADOLINT: true
           VALIDATE_MARKDOWN: true
-          LOG_LEVEL: WARN
+          # LOG_LEVEL: WARN
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
