@@ -3,6 +3,9 @@ name: SecOps
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - secops
 
 jobs:
   build_publish:
