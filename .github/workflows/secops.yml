@@ -2,12 +2,11 @@
 name: SecOps
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       image_tag:
         description: image:tag
         required: true
-        default: "ghcr.io/boehringer-ingelheim/r_4.3.2_cran_2024.01.12:latest"
         type: string
 
 jobs:
