@@ -124,12 +124,7 @@ jobs:
             QUARTO_VERSION=${{ github.event.inputs.quarto_version }}
 
   sec_ops:
-    name: SecOps
-    needs: build_publish
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Update security artifacts
-        uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@secops
-        with:
-          image_tag: "${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}"
+    name: Update security artifacts
+    uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@secops
+    with:
+      image_tag: "${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}"
