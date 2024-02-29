@@ -3,33 +3,36 @@ name: SecOps
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - secops
+    inputs:
+      image_tag:
+        description: image:tag
+        required: false
+        default: "ghcr.io/boehringer-ingelheim/r_4.3.2_cran_2024.01.12:latest"
+        type: string
 
 jobs:
   build_publish:
-    name: Build and Publish Image
+    name: SecOps
     runs-on: ubuntu-latest
 
     permissions:
       security-events: write
 
     steps:
-      #   - name: Generate R pkg list ✏️
-      #     shell: bash
-      #     run: |
-      #       docker run -v ${PWD}:/app ${{ steps.build_vars.outputs.IMAGE_NAME }}:${{ steps.build_vars.outputs.IMAGE_DATE_TAG }} \
-      #       R -q -e '
-      #       rbind(c("|-", "-|"),
-      #       installed.packages()[, c("Package", "Version")]) |>
-      #       write.table(file = "/app/r-pkg-list.csv", row.names = FALSE, quote = FALSE, sep="|")'
-      #       cat r-pkg-list.csv >> $GITHUB_STEP_SUMMARY
+      - name: Generate R pkg list ✏️
+        shell: bash
+        run: |
+          docker run -v ${PWD}:/app ${{ inputs.image_tag }} \
+          R -q -e '
+          rbind(c("|-", "-|"),
+          installed.packages()[, c("Package", "Version")]) |>
+          write.table(file = "/app/r-pkg-list.csv", row.names = FALSE, quote = FALSE, sep="|")'
+          cat r-pkg-list.csv >> $GITHUB_STEP_SUMMARY
 
       - name: Run Trivy vulnerability scanner ☢️
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/boehringer-ingelheim/r_4.3.2_cran_2024.01.12:latest
+          image-ref: ${{ inputs.image_tag }}
           exit-code: 0
           ignore-unfixed: true
           vuln-type: "os,library"
