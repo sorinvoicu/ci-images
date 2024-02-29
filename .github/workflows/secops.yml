@@ -11,7 +11,7 @@ on:
         type: string
 
 jobs:
-  build_publish:
+  sec_ops:
     name: SecOps
     runs-on: ubuntu-latest
 
