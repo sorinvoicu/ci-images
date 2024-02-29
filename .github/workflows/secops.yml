@@ -1,0 +1,42 @@
+---
+name: SecOps
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_publish:
+    name: Build and Publish Image
+    runs-on: ubuntu-latest
+
+    permissions:
+      security-events: write
+
+    steps:
+      #   - name: Generate R pkg list ✏️
+      #     shell: bash
+      #     run: |
+      #       docker run -v ${PWD}:/app ${{ steps.build_vars.outputs.IMAGE_NAME }}:${{ steps.build_vars.outputs.IMAGE_DATE_TAG }} \
+      #       R -q -e '
+      #       rbind(c("|-", "-|"),
+      #       installed.packages()[, c("Package", "Version")]) |>
+      #       write.table(file = "/app/r-pkg-list.csv", row.names = FALSE, quote = FALSE, sep="|")'
+      #       cat r-pkg-list.csv >> $GITHUB_STEP_SUMMARY
+
+      - name: Run Trivy vulnerability scanner ☢️
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/boehringer-ingelheim/r_4.3.2_cran_2024.01.12:latest
+          exit-code: 0
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH,MEDIUM"
+          format: "sarif"
+          output: "trivy-results.sarif"
+          timeout: 30m0s
+
+      - name: Upload Trivy scan results to GitHub Security tab 📜
+        # if: github.ref_name == 'main'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "trivy-results.sarif"
