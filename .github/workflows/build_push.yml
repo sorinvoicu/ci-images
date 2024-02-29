@@ -124,6 +124,7 @@ jobs:
             QUARTO_VERSION=${{ github.event.inputs.quarto_version }}
 
   sec_ops:
+    if: github.ref_name == 'main'
     needs: build_publish
 
     permissions:

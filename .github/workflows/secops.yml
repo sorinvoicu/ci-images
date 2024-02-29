@@ -25,7 +25,7 @@ jobs:
           R -q -e '
           rbind(c("|-", "-|"),
           installed.packages()[, c("Package", "Version")]) |>
-          write.table(file = "/app/r-pkg-list.csv", row.names = FALSE, quote = FALSE, sep="|")'
+          write.table(file = "~/r-pkg-list.csv", row.names = FALSE, quote = FALSE, sep="|")'
           cat r-pkg-list.csv >> $GITHUB_STEP_SUMMARY
 
       - name: Run Trivy vulnerability scanner ☢️
@@ -41,7 +41,6 @@ jobs:
           timeout: 30m0s
 
       - name: Upload Trivy scan results to GitHub Security tab 📜
-        # if: github.ref_name == 'main'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "trivy-results.sarif"

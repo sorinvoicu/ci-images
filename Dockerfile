@@ -16,6 +16,9 @@ ENV TZ=Etc/UTC
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
+RUN adduser --system --group ci-user
+USER ci-user
+
 COPY rocker_scripts/scripts /rocker_scripts
 RUN /rocker_scripts/install_R_source.sh && \
     /rocker_scripts/setup_R.sh && \
@@ -31,9 +34,7 @@ COPY configs/.lintr /
 ENV R_LINTR_LINTER_FILE=/.lintr
 
 # Cleanup
-RUN rm -rf /rocker_scripts /scripts && \
-    adduser --system --group --no-create-home ci-user
-USER ci-user
+RUN rm -rf /rocker_scripts /scripts 
 
 CMD ["/init"]
 
