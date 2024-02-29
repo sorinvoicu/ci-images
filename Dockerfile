@@ -16,9 +16,6 @@ ENV TZ=Etc/UTC
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
-RUN useradd -ms /bin/bash ci-user && usermod -aG sudo ci-user
-USER ci-user
-
 COPY rocker_scripts/scripts /rocker_scripts
 RUN /rocker_scripts/install_R_source.sh && \
     /rocker_scripts/setup_R.sh && \
