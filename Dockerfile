@@ -31,7 +31,9 @@ COPY configs/.lintr /
 ENV R_LINTR_LINTER_FILE=/.lintr
 
 # Cleanup
-RUN rm -rf /rocker_scripts /scripts
+RUN rm -rf /rocker_scripts /scripts && \
+    adduser --system --group --no-create-home ci-user
+USER ci-user
 
 CMD ["/init"]
 
