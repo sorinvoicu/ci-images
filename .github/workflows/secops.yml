@@ -32,7 +32,7 @@ jobs:
           rbind(c("|-", "-|"),
           installed.packages()[, c("Package", "Version")]) |>
           write.table(file = "/app/r-pkg-list.csv", row.names = FALSE, quote = FALSE, sep="|")'
-          cat /app/r-pkg-list.csv >> $GITHUB_STEP_SUMMARY
+          cat r-pkg-list.csv >> $GITHUB_STEP_SUMMARY
 
       - name: Run Trivy vulnerability scanner ☢️
         uses: aquasecurity/trivy-action@master
