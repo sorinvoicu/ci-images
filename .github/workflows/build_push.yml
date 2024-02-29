@@ -52,7 +52,6 @@ jobs:
 
     permissions:
       packages: write
-      security-events: write
 
     steps:
       - name: Checkout project ⬇️
@@ -120,31 +119,7 @@ jobs:
             PANDOC_VERSION=${{ github.event.inputs.pandoc_version }}
             QUARTO_VERSION=${{ github.event.inputs.quarto_version }}
 
-      - name: Generate R pkg list ✏️
-        shell: bash
-        run: |
-          docker run -v ${PWD}:/app ${{ steps.build_vars.outputs.IMAGE_NAME }}:${{ steps.build_vars.outputs.IMAGE_DATE_TAG }} \
-          R -q -e '
-          rbind(c("|-", "-|"),
-          installed.packages()[, c("Package", "Version")]) |>
-          write.table(file = "/app/r-pkg-list.csv", row.names = FALSE, quote = FALSE, sep="|")'
-          cat r-pkg-list.csv >> $GITHUB_STEP_SUMMARY
-
-      - name: Run Trivy vulnerability scanner ☢️
-        if: github.ref_name == 'main'
-        uses: aquasecurity/trivy-action@master
+      - name: Update security artifacts
+        uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@secops
         with:
-          image-ref: ${{ steps.build_vars.outputs.IMAGE_NAME }}:${{ steps.build_vars.outputs.IMAGE_DATE_TAG }}
-          exit-code: 0
-          ignore-unfixed: true
-          vuln-type: "os,library"
-          severity: "CRITICAL,HIGH,MEDIUM"
-          format: "sarif"
-          output: "trivy-results.sarif"
-          timeout: 30m0s
-
-      - name: Upload Trivy scan results to GitHub Security tab 📜
-        if: github.ref_name == 'main'
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: "trivy-results.sarif"
+          image_tag: "${{ steps.build_vars.outputs.IMAGE_NAME }}:${{ steps.build_vars.outputs.IMAGE_DATE_TAG }}"
