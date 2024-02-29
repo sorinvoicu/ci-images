@@ -52,7 +52,6 @@ jobs:
 
     permissions:
       packages: write
-      security-events: write
 
     outputs:
       image: ${{ steps.build_vars.outputs.IMAGE_NAME }}
@@ -126,6 +125,10 @@ jobs:
 
   sec_ops:
     needs: build_publish
+
+    permissions:
+      security-events: write
+
     name: Update security artifacts
     uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@main
     with:
