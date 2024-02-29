@@ -8,12 +8,13 @@ on:
         description: image:tag
         required: true
         type: string
+
   workflow_dispatch:
     inputs:
       image_tag:
         description: image:tag
         required: true
-        default: "ghcr.io/boehringer-ingelheim/r_4.3.2_cran_2024.01.12:2024.02.29"
+        default: ""
         type: string
 jobs:
   sec_ops:
