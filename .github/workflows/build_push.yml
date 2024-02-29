@@ -124,6 +124,7 @@ jobs:
             QUARTO_VERSION=${{ github.event.inputs.quarto_version }}
 
   sec_ops:
+    needs: build_publish
     name: Update security artifacts
     uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@secops
     with:
