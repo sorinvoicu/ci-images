@@ -52,6 +52,7 @@ jobs:
 
     permissions:
       packages: write
+      security-events: write
 
     outputs:
       image: ${{ steps.build_vars.outputs.IMAGE_NAME }}
