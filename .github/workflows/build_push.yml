@@ -118,3 +118,8 @@ jobs:
             OS_VERSION=${{ env.OS_VERSION }}
             PANDOC_VERSION=${{ github.event.inputs.pandoc_version }}
             QUARTO_VERSION=${{ github.event.inputs.quarto_version }}
+
+      - name: Update security artifacts
+        uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@secops
+        with:
+          image_tag: "${{ steps.build_vars.outputs.IMAGE_NAME }}:${{ steps.build_vars.outputs.IMAGE_DATE_TAG }}"
