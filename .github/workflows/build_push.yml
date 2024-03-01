@@ -137,16 +137,16 @@ jobs:
       - name: Generate release body 📜
         id: build-release
         run: |
-          echo "Release ${{ needs.build_publish.outputs.tag }}\n\n "\
+          printf "Release ${{ needs.build_publish.outputs.tag }}\n\n "\
           "You may view the artifacts in this release for more information "\
           "about the images that were published." > RELEASE_BODY.txt
           echo "TAGGED_IMAGE=${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}" >> $GITHUB_OUTPUT
-          echo "SBOM_OUTPUT_FILENAME=$GITHUB_WORKSPACE/sbom.json" >> $GITHUB_OUTPUT
+          echo "SBOM_OUTPUT_FILENAME=${{ github.workspace }}/sbom.json" >> $GITHUB_OUTPUT
 
       - name: Generate image manifest and R package list 🛞
         run: |
-          docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > $GITHUB_WORKSPACE//manifest.json
-          docker run -v $GITHUB_WORKSPACE:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
+          docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > ${{ github.workspace }}/manifest.json
+          docker run -v ${{ github.workspace }}:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
             R -q -e 'write.csv(installed.packages(), file="/app/package_list.csv")'
 
       # - name: Generate SBOM 📃
@@ -161,8 +161,8 @@ jobs:
         with:
           body_path: RELEASE_BODY.txt
           token: ${{ secrets.GITHUB_TOKEN }}
-          generate_release_notes: true
+          generate_release_notes: no
           tag_name: ${{ needs.build_publish.outputs.tag }}
           files: |
-            "$GITHUB_WORKSPACE/manifest.json"
-            "$GITHUB_WORKSPACE/package_list.csv"
+            "${{ github.workspace }}/manifest.json"
+            "${{ github.workspace }}/package_list.csv"
