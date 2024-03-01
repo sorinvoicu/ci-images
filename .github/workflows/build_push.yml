@@ -146,8 +146,8 @@ jobs:
       - name: Generate image manifest and R package list 🛞
         run: |
           docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > ${{ github.workspace }}/manifest.json
-          docker run -v ${{ github.workspace }}:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
-            R -q -e 'write.csv(installed.packages(), file="/app/package_list.csv")'
+          docker run -v ${PWD}:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
+          R -q -e 'write.csv(installed.packages(), file="/app/package_list.csv")'
 
       # - name: Generate SBOM 📃
       #   uses: anchore/sbom-action@v0
@@ -163,6 +163,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           generate_release_notes: no
           tag_name: ${{ needs.build_publish.outputs.tag }}
-          files: |
-            "${{ github.workspace }}/manifest.json"
-            "${{ github.workspace }}/package_list.csv"
+
+      - name: Upload R package list to release 🔼
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: "package_list.csv"
+          asset_name: "package.list.${{ needs.build_publish.outputs.image }}.csv"
+          tag: "${{ needs.build_publish.outputs.tag }}"
+          overwrite: true
