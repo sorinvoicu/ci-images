@@ -175,6 +175,7 @@ jobs:
     permissions:
       security-events: write
 
+    name: Update security artifacts
     uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@main
     with:
       image_tag: "${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}"

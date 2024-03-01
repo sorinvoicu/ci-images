@@ -11,7 +11,7 @@ on:
 
 jobs:
   sec_ops:
-    name: Update security artifacts
+    name: SecOps
     runs-on: ubuntu-latest
 
     permissions:
