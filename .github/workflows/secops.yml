@@ -9,13 +9,6 @@ on:
         required: true
         type: string
 
-  workflow_dispatch:
-    inputs:
-      image_tag:
-        description: image:tag
-        required: true
-        default: ""
-        type: string
 jobs:
   sec_ops:
     name: SecOps
@@ -25,16 +18,6 @@ jobs:
       security-events: write
 
     steps:
-      - name: Generate R pkg list ✏️
-        shell: bash
-        run: |
-          docker run -v ${PWD}:/app ${{ inputs.image_tag }} \
-          R -q -e '
-          rbind(c("|-", "-|"),
-          installed.packages()[, c("Package", "Version")]) |>
-          write.table(file = "/app/r-pkg-list.csv", row.names = FALSE, quote = FALSE, sep="|")'
-          cat r-pkg-list.csv >> $GITHUB_STEP_SUMMARY
-
       - name: Run Trivy vulnerability scanner ☢️
         uses: aquasecurity/trivy-action@master
         with:
