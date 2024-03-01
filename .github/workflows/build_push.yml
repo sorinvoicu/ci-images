@@ -138,7 +138,7 @@ jobs:
         id: build-release
         shell: bash
         run: |
-          echo "RELEASE_BODY=Check the artifacts in this release for more information about the published image." >> $GITHUB_OUTPUT
+          echo "Check the artifacts in this release for more information about the published image." > RELEASE_BODY
           echo "TAGGED_IMAGE=${{ needs.build_publish.outputs.IMAGE }}:${{ needs.build_publish.outputs.TAG }}" >> $GITHUB_OUTPUT
           echo "SBOM_OUTPUT_FILENAME=${{ github.workspace }}/sbom.json" >> $GITHUB_OUTPUT
 
@@ -162,6 +162,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           generate_release_notes: no
           tag_name: ${{ needs.build_publish.outputs.TAG }}
+          body_path: RELEASE_BODY
 
       - name: Upload artifact to release
         uses: svenstaro/upload-release-action@v2
