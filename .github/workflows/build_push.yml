@@ -127,7 +127,7 @@ jobs:
     if: github.ref_name == 'main'
     needs: build_publish
 
-    name: Create release 🚀
+    name: Create release
     runs-on: ubuntu-latest
 
     steps:
@@ -144,7 +144,7 @@ jobs:
         run: |
           docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > manifest.json
           docker run -v ${PWD}:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
-            R -e -q 'write.csv(installed.packages(), file="/app/package_list.csv")'
+            R -q -e 'write.csv(installed.packages(), file="/app/package_list.csv")'
 
       - name: Generate SBOM 📃
         uses: anchore/sbom-action@v0
@@ -164,15 +164,3 @@ jobs:
             "${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
             "manifest.json"
             "package_list.csv"
-
-  # sec_ops:
-  #   if: github.ref_name == 'main'
-  #   needs: create-release
-
-  #   permissions:
-  #     security-events: write
-
-  #   name: Update security artifacts
-  #   uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@main
-  #   with:
-  #     image_tag: "${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}"
