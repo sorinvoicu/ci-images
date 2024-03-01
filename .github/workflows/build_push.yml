@@ -141,7 +141,7 @@ jobs:
           NORMALISED_IMAGE=$(echo '${{ needs.build_publish.outputs.IMAGE }}' | sed 's/\//_/g')
           echo "RELEASE_BODY=Check the artifacts in this release for more information about the published image." >> $GITHUB_OUTPUT
           echo "TAGGED_IMAGE=${{ needs.build_publish.outputs.IMAGE }}:${{ needs.build_publish.outputs.TAG }}" >> $GITHUB_OUTPUT
-          echo "MANIFEST_OUTPUT_FILENAME=image_manifest_$NORMALISED_IMAGE.json" >> $GITHUB_OUTPUT
+          echo "MANIFEST_OUTPUT_FILENAME=Image_manifest_$NORMALISED_IMAGE.json" >> $GITHUB_OUTPUT
           echo "R_PKG_OUTPUT_FILENAME=R_package_list_$NORMALISED_IMAGE.csv" >> $GITHUB_OUTPUT
           echo "SBOM_OUTPUT_FILENAME=SBOM_for_$NORMALISED_IMAGE.spdx.json" >> $GITHUB_OUTPUT
 
@@ -162,6 +162,7 @@ jobs:
       - name: Upload artifacts to release ⬆️
         uses: marvinpinto/action-automatic-releases@latest
         with:
+          prerelease: false
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           title: ${{ needs.build_publish.outputs.TAG }}
@@ -170,14 +171,14 @@ jobs:
             ${{ steps.build-release.outputs.R_PKG_OUTPUT_FILENAME }}
             ${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}
 
-  # sec_ops:
-  #   if: github.ref_name == 'main'
-  #   needs: build_publish
+  sec_ops:
+    if: github.ref_name == 'main'
+    needs: build_publish
 
-  #   permissions:
-  #     security-events: write
+    permissions:
+      security-events: write
 
-  #   name: Update security artifacts
-  #   uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@main
-  #   with:
-  #     image_tag: "${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}"
+    name: Update security artifacts
+    uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@main
+    with:
+      image_tag: "${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}"
