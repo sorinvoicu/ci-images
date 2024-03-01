@@ -145,8 +145,8 @@ jobs:
 
       - name: Generate image manifest and R package list 🛞
         run: |
-          docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > /manifest.json
-          docker run -v /.:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
+          docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > $GITHUB_WORKSPACE//manifest.json
+          docker run -v $GITHUB_WORKSPACE:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
             R -q -e 'write.csv(installed.packages(), file="/app/package_list.csv")'
 
       # - name: Generate SBOM 📃
@@ -164,5 +164,5 @@ jobs:
           generate_release_notes: true
           tag_name: ${{ needs.build_publish.outputs.tag }}
           files: |
-            "/manifest.json"
-            "/package_list.csv"
+            "$GITHUB_WORKSPACE/manifest.json"
+            "$GITHUB_WORKSPACE/package_list.csv"
