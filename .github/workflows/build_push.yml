@@ -168,7 +168,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: "package_list.csv"
-          asset_name: "package.list.${{ needs.build_publish.outputs.IMAGE }}.csv"
+          asset_name: "R_package_list_${{ needs.build_publish.outputs.IMAGE }}.csv"
           tag: "${{ needs.build_publish.outputs.TAG }}"
           overwrite: true
-          body: "${{ steps.build-release.outputs.RELEASE_BODY }}"
