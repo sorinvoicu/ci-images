@@ -120,8 +120,8 @@ jobs:
             QUARTO_VERSION=${{ github.event.inputs.quarto_version }}
 
     outputs:
-      image: ${{ steps.build_vars.outputs.IMAGE_NAME }}
-      tag: ${{ steps.build_vars.outputs.IMAGE_DATE_TAG }}
+      IMAGE: ${{ steps.build_vars.outputs.IMAGE_NAME }}
+      TAG: ${{ steps.build_vars.outputs.IMAGE_DATE_TAG }}
 
   create-release:
     if: github.ref_name == 'main'
@@ -136,14 +136,14 @@ jobs:
     steps:
       - name: Generate release body 📜
         id: build-release
+        shell: bash
         run: |
-          printf "Release ${{ needs.build_publish.outputs.tag }}\n\n "\
-          "You may view the artifacts in this release for more information "\
-          "about the images that were published." > RELEASE_BODY.txt
-          echo "TAGGED_IMAGE=${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}" >> $GITHUB_OUTPUT
+          echo "RELEASE_BODY=Check the artifacts in this release for more information about the published image." >> $GITHUB_OUTPUT
+          echo "TAGGED_IMAGE=${{ needs.build_publish.outputs.IMAGE }}:${{ needs.build_publish.outputs.TAG }}" >> $GITHUB_OUTPUT
           echo "SBOM_OUTPUT_FILENAME=${{ github.workspace }}/sbom.json" >> $GITHUB_OUTPUT
 
       - name: Generate image manifest and R package list 🛞
+        shell: bash
         run: |
           docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > ${{ github.workspace }}/manifest.json
           docker run -v ${PWD}:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
@@ -156,19 +156,20 @@ jobs:
       #     output-file: "${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
       #     artifact-name: "sbom.spdx"
 
-      - name: Create release 🎁
-        uses: softprops/action-gh-release@v1
-        with:
-          body_path: RELEASE_BODY.txt
-          token: ${{ secrets.GITHUB_TOKEN }}
-          generate_release_notes: no
-          tag_name: ${{ needs.build_publish.outputs.tag }}
+      # - name: Create release 🎁
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     body_path: RELEASE_BODY.txt
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     generate_release_notes: no
+      #     tag_name: ${{ needs.build_publish.outputs.tag }}
 
-      - name: Upload R package list to release 🔼
+      - name: Upload artifact to release 🔼
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: "package_list.csv"
-          asset_name: "package.list.${{ needs.build_publish.outputs.image }}.csv"
-          tag: "${{ needs.build_publish.outputs.tag }}"
+          asset_name: "package.list.${{ needs.build_publish.outputs.IMAGE }}.csv"
+          tag: "${{ needs.build_publish.outputs.TAG }}"
           overwrite: true
+          body: "${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
