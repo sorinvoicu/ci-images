@@ -138,37 +138,37 @@ jobs:
         id: build-release
         shell: bash
         run: |
-          NORMALISED_IMAGE=$(echo ${{ needs.build_publish.outputs.IMAGE }} | sed 's/\//_/g')
+          NORMALISED_IMAGE=$(echo '${{ needs.build_publish.outputs.IMAGE }}' | sed 's/\//_/g')
           echo "RELEASE_BODY=Check the artifacts in this release for more information about the published image." >> $GITHUB_OUTPUT
           echo "TAGGED_IMAGE=${{ needs.build_publish.outputs.IMAGE }}:${{ needs.build_publish.outputs.TAG }}" >> $GITHUB_OUTPUT
           echo "MANIFEST_OUTPUT_FILENAME=image_manifest_$NORMALISED_IMAGE.json" >> $GITHUB_OUTPUT
           echo "R_PKG_OUTPUT_FILENAME=R_package_list_$NORMALISED_IMAGE.csv" >> $GITHUB_OUTPUT
           echo "SBOM_OUTPUT_FILENAME=SBOM_for_$NORMALISED_IMAGE.spdx.json" >> $GITHUB_OUTPUT
 
-      # - name: Generate image manifest and R package list 🛞
-      #   shell: bash
-      #   run: |
-      #     docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > ${{ steps.build-release.outputs.MANIFEST_OUTPUT_FILENAME }}
-      #     docker run -v ${PWD}:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
-      #     R -q -e 'write.csv(installed.packages(), file="/app/${{ steps.build-release.outputs.R_PKG_OUTPUT_FILENAME }}")'
+      - name: Generate image manifest and R package list 🛞
+        shell: bash
+        run: |
+          docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > ${{ steps.build-release.outputs.MANIFEST_OUTPUT_FILENAME }}
+          docker run -v ${PWD}:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
+          R -q -e 'write.csv(installed.packages(), file="/app/${{ steps.build-release.outputs.R_PKG_OUTPUT_FILENAME }}")'
 
-      # - name: Generate SBOM 📃
-      #   uses: anchore/sbom-action@v0
-      #   with:
-      #     image: "${{ steps.build-release.outputs.TAGGED_IMAGE }}"
-      #     output-file: "${{ github.workspace }}/${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
-      #     artifact-name: "sbom.spdx"
+      - name: Generate SBOM 📃
+        uses: anchore/sbom-action@v0
+        with:
+          image: "${{ steps.build-release.outputs.TAGGED_IMAGE }}"
+          output-file: "${{ github.workspace }}/${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
+          artifact-name: "sbom.spdx"
 
-      # - name: Upload artifacts to release ⬆️
-      #   uses: marvinpinto/action-automatic-releases@latest
-      #   with:
-      #     repo_token: "${{ secrets.GITHUB_TOKEN }}"
-      #     automatic_release_tag: "latest"
-      #     title: ${{ needs.build_publish.outputs.TAG }}
-      #     files: |
-      #       ${{ steps.build-release.outputs.MANIFEST_OUTPUT_FILENAME }}
-      #       ${{ steps.build-release.outputs.R_PKG_OUTPUT_FILENAME }}
-      #       ${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}
+      - name: Upload artifacts to release ⬆️
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          title: ${{ needs.build_publish.outputs.TAG }}
+          files: |
+            ${{ steps.build-release.outputs.MANIFEST_OUTPUT_FILENAME }}
+            ${{ steps.build-release.outputs.R_PKG_OUTPUT_FILENAME }}
+            ${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}
 
   # sec_ops:
   #   if: github.ref_name == 'main'
