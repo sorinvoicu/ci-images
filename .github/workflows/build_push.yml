@@ -162,7 +162,7 @@ jobs:
         with:
           prerelease: false
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
+          automatic_release_tag: ${{ needs.build_publish.outputs.TAG }}
           title: ${{ needs.build_publish.outputs.TAG }}
           files: |
             ${{ steps.build-release.outputs.MANIFEST_OUTPUT_FILENAME }}
