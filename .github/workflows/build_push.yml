@@ -156,15 +156,14 @@ jobs:
       #     output-file: "${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
       #     artifact-name: "sbom.spdx"
 
-      # - name: Create release 🎁
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     body_path: RELEASE_BODY.txt
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     generate_release_notes: no
-      #     tag_name: ${{ needs.build_publish.outputs.tag }}
+      - name: Create release 🎁
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generate_release_notes: no
+          tag_name: ${{ needs.build_publish.outputs.TAG }}
 
-      - name: Upload artifact to release 🔼
+      - name: Upload artifact to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -172,4 +171,4 @@ jobs:
           asset_name: "package.list.${{ needs.build_publish.outputs.IMAGE }}.csv"
           tag: "${{ needs.build_publish.outputs.TAG }}"
           overwrite: true
-          body: "${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
+          body: "${{ steps.build-release.outputs.RELEASE_BODY }}"
