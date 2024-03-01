@@ -139,7 +139,6 @@ jobs:
         shell: bash
         run: |
           NORMALISED_IMAGE=$(echo '${{ needs.build_publish.outputs.IMAGE }}' | sed 's/\//_/g')
-          echo "RELEASE_BODY=Check the artifacts in this release for more information about the published image." >> $GITHUB_OUTPUT
           echo "TAGGED_IMAGE=${{ needs.build_publish.outputs.IMAGE }}:${{ needs.build_publish.outputs.TAG }}" >> $GITHUB_OUTPUT
           echo "MANIFEST_OUTPUT_FILENAME=Image_manifest_$NORMALISED_IMAGE.json" >> $GITHUB_OUTPUT
           echo "R_PKG_OUTPUT_FILENAME=R_package_list_$NORMALISED_IMAGE.csv" >> $GITHUB_OUTPUT
@@ -157,7 +156,6 @@ jobs:
         with:
           image: "${{ steps.build-release.outputs.TAGGED_IMAGE }}"
           output-file: "${{ github.workspace }}/${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
-          artifact-name: "sbom.spdx"
 
       - name: Upload artifacts to release ⬆️
         uses: marvinpinto/action-automatic-releases@latest
