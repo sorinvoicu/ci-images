@@ -138,26 +138,18 @@ jobs:
         id: build-release
         shell: bash
         run: |
-          echo "Check the artifacts in this release for more information about the published image." > RELEASE_BODY
+          echo "RELEASE_BODY=Check the artifacts in this release for more information about the published image." >> $GITHUB_OUTPUT
           echo "TAGGED_IMAGE=${{ needs.build_publish.outputs.IMAGE }}:${{ needs.build_publish.outputs.TAG }}" >> $GITHUB_OUTPUT
-          echo "SBOM_OUTPUT_FILENAME=${{ github.workspace }}/sbom.json" >> $GITHUB_OUTPUT
+          echo "MANIFEST_OUTPUT_FILENAME=image_manifest_${{ needs.build_publish.outputs.IMAGE }}.json" >> $GITHUB_OUTPUT
+          echo "R_PKG_OUTPUT_FILENAME=R_package_list_${{ needs.build_publish.outputs.IMAGE }}.csv" >> $GITHUB_OUTPUT
+          echo "SBOM_OUTPUT_FILENAME='SBOM for ${{ needs.build_publish.outputs.IMAGE }}.spdx.json'" >> $GITHUB_OUTPUT
 
       - name: Generate image manifest and R package list 🛞
         shell: bash
         run: |
-          docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > manifest.json
+          docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > ${{ steps.build-release.outputs.MANIFEST_OUTPUT_FILENAME }}
           docker run -v ${PWD}:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
-          R -q -e 'write.csv(installed.packages(), file="/app/package_list.csv")'
-
-      - uses: marvinpinto/action-automatic-releases@latest
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Development Build"
-          files: |
-            manifest.json
-            package_list.csv
+          R -q -e 'write.csv(installed.packages(), file="/app/${{ steps.build-release.outputs.R_PKG_OUTPUT_FILENAME }}")'
 
       # - name: Generate SBOM 📃
       #   uses: anchore/sbom-action@v0
@@ -166,48 +158,24 @@ jobs:
       #     output-file: "${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
       #     artifact-name: "sbom.spdx"
 
-  #     - name: Create release 🎁
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-  #         generate_release_notes: no
-  #         tag_name: ${{ needs.build_publish.outputs.TAG }}
-  #         body_path: RELEASE_BODY
+      - name: Upload artifacts to release ⬆️
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "${{ steps.build-release.outputs.RELEASE_BODY }}"
+          files: |
+            ${{ steps.build-release.outputs.MANIFEST_OUTPUT_FILENAME }}
+            ${{ steps.build-release.outputs.R_PKG_OUTPUT_FILENAME }}
 
-  #     - name: Upload artifact to release ⬆️
-  #       uses: svenstaro/upload-release-action@v2
-  #       with:
-  #         repo_token: ${{ secrets.GITHUB_TOKEN }}
-  #         file: "manifest.json"
-  #         asset_name: "image_manifest_${{ needs.build_publish.outputs.IMAGE }}.json"
-  #         tag: "${{ needs.build_publish.outputs.TAG }}"
-  #         overwrite: true
+  sec_ops:
+    if: github.ref_name == 'main'
+    needs: build_publish
 
-  #     - name: Upload artifact to release ⬆️
-  #       uses: svenstaro/upload-release-action@v2
-  #       with:
-  #         repo_token: ${{ secrets.GITHUB_TOKEN }}
-  #         file: "package_list.csv"
-  #         asset_name: "R_package_list_${{ needs.build_publish.outputs.IMAGE }}.csv"
-  #         tag: "${{ needs.build_publish.outputs.TAG }}"
-  #         overwrite: true
+    permissions:
+      security-events: write
 
-  #     - name: Upload artifact to release ⬆️
-  #       uses: svenstaro/upload-release-action@v2
-  #       with:
-  #         repo_token: ${{ secrets.GITHUB_TOKEN }}
-  #         file: "${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
-  #         asset_name: "SBOM for ${{ needs.build_publish.outputs.IMAGE }}.spdx.json"
-  #         tag: "${{ needs.build_publish.outputs.TAG }}"
-  #         overwrite: true
-
-  # sec_ops:
-  #   if: github.ref_name == 'main'
-  #   needs: build_publish
-
-  #   permissions:
-  #     security-events: write
-
-  #   uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@main
-  #   with:
-  #     image_tag: "${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}"
+    uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@main
+    with:
+      image_tag: "${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}"
