@@ -130,6 +130,9 @@ jobs:
     name: Create release
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
       - name: Generate release body 📜
         id: build-release
@@ -142,16 +145,16 @@ jobs:
 
       - name: Generate image manifest and R package list 🛞
         run: |
-          docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > manifest.json
-          docker run -v ${PWD}:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
+          docker manifest inspect ${{ steps.build-release.outputs.TAGGED_IMAGE }} > /manifest.json
+          docker run -v /.:/app ${{ steps.build-release.outputs.TAGGED_IMAGE }} \
             R -q -e 'write.csv(installed.packages(), file="/app/package_list.csv")'
 
-      - name: Generate SBOM 📃
-        uses: anchore/sbom-action@v0
-        with:
-          image: "${{ steps.build-release.outputs.TAGGED_IMAGE }}"
-          output-file: "${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
-          artifact-name: "sbom.spdx"
+      # - name: Generate SBOM 📃
+      #   uses: anchore/sbom-action@v0
+      #   with:
+      #     image: "${{ steps.build-release.outputs.TAGGED_IMAGE }}"
+      #     output-file: "${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
+      #     artifact-name: "sbom.spdx"
 
       - name: Create release 🎁
         uses: softprops/action-gh-release@v1
@@ -161,6 +164,5 @@ jobs:
           generate_release_notes: true
           tag_name: ${{ needs.build_publish.outputs.tag }}
           files: |
-            "${{ steps.build-release.outputs.SBOM_OUTPUT_FILENAME }}"
-            "manifest.json"
-            "package_list.csv"
+            "/manifest.json"
+            "/package_list.csv"
