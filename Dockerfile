@@ -27,9 +27,6 @@ COPY scripts /scripts
 RUN /scripts/install_sys_deps.sh && \
     /scripts/install_r_pkgs.R 
 
-COPY configs/.lintr /
-ENV R_LINTR_LINTER_FILE=/.lintr
-
 # Cleanup
 RUN rm -rf /rocker_scripts /scripts 
 
