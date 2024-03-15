@@ -5,6 +5,7 @@ set -e
 pkgs_to_install="\
 lbzip2 \
 rsync \
+qpdf \
 "
 apt-get update -y
 apt-get install -q -y ${pkgs_to_install}
