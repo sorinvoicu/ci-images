@@ -196,6 +196,6 @@ jobs:
     steps:
      - name: Clean old artifacts
        uses: actions/delete-package-versions@v5
-       with:
-         package-name: ${{ needs.build_publish.outputs.IMAGE }}
-         min-versions-to-keep: 2
+      #  with:
+      #    package-name: ${{ needs.build_publish.outputs.IMAGE }}
+      #    min-versions-to-keep: 2
