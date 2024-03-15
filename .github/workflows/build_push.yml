@@ -183,44 +183,48 @@ jobs:
   #   with:
   #     image_tag: "${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}"
 
-  clean_up:
-    if: github.ref_name == 'main'
-    # needs: build_publish
+  # clean_up:
+  #   if: github.ref_name == 'main'
+  #   # needs: build_publish
 
-    name: Package maintenance
-    runs-on: ubuntu-latest
+  #   name: Package maintenance
+  #   runs-on: ubuntu-latest
     
-    permissions:
-      packages: write
+  #   permissions:
+  #     packages: write
     
-    steps:
-     - name: Clean old artifacts
-       uses: actions/delete-package-versions@v5
-       with:
-         owner: 'sorinvoicu'
-         package-type: container
-        #  package-name: 'r_4.3.2_cran_2024.01.12'
-         min-versions-to-keep: 0
-        #  delete-only-untagged-versions: false
-         token: ${{ secrets.GH_PAT }}
+  #   steps:
+  #    - name: Clean old artifacts
+  #      uses: actions/delete-package-versions@v5
+  #      with:
+  #        owner: 'sorinvoicu'
+  #        package-type: container
+  #       #  package-name: 'r_4.3.2_cran_2024.01.12'
+  #        min-versions-to-keep: 0
+  #       #  delete-only-untagged-versions: false
+  #        token: ${{ secrets.GH_PAT }}
 
-    # clean_up:
-    #   if: github.ref_name == 'main'
-    #   # needs: build_publish
+    clean_up:
+      if: github.ref_name == 'main'
+      # needs: build_publish
 
-    #   name: Package maintenance
-    #   runs-on: ubuntu-latest
+      name: Package maintenance
+      runs-on: ubuntu-latest
       
-    #   permissions:
-    #     packages: write
+      permissions:
+        packages: write
       
-    #   steps:
-    #   - name: Clean old artifacts
-    #     uses: bots-house/ghcr-delete-image-action@v1.1.0
-    #     with:
-    #       owner: 'sorinvoicu'
-    #       # package-type: container
-    #       name: 'r_4.3.2_cran_2024.01.12'
-    #       tag: '2024.03.15'
-    #       #  delete-only-untagged-versions: false
-    #       token: ${{ secrets.GH_PAT }}
+      steps:
+      - name: Clean GHCR packages
+        uses: cresh-io/action-ghcr-batch-delete-versions@v1
+        with:
+          github-access-token: "${{ secrets.GH_PAT }}"
+          org: "${{ github.repository_owner }}"
+          package_name: "${{ github.repository }}"
+          package_type: "container"   # Default is container because the action was design only for containers at first
+          selector: |
+              type=tagCount;operator=greaterThan;value=0
+              type=tags;operator=startsWith;value=pr-1-
+          excluder: |
+              type=tags;operator=equals;value=pr-1-ee20adc
+          dry-run: "0"
