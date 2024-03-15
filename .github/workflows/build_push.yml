@@ -180,3 +180,15 @@ jobs:
     uses: boehringer-ingelheim/dv.ci-images/.github/workflows/secops.yml@main
     with:
       image_tag: "${{ needs.build_publish.outputs.image }}:${{ needs.build_publish.outputs.tag }}"
+
+  clean_up:
+    if: github.ref_name == 'main'
+    needs: build_publish
+
+    permissions:
+      packages: write
+    
+    uses: actions/delete-package-versions@v5
+    with:
+      package-name: ${{ needs.build_publish.outputs.IMAGE }}
+      min-versions-to-keep: 2
