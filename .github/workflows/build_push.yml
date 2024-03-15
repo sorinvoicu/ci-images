@@ -221,6 +221,6 @@ jobs:
           owner: 'sorinvoicu'
           # package-type: container
           name: 'r_4.3.2_cran_2024.01.12'
-          min-versions-to-keep: 1
+          tag: '2024.03.15'
           #  delete-only-untagged-versions: false
           #  token: ${{ secrets.GH_PAT }}
