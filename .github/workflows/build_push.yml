@@ -199,6 +199,6 @@ jobs:
        with:
          owner: 'sorinvoicu'
          package-name: 'r_4.3.2_cran_2024.01.12'
-         min-versions-to-keep: 0
-         delete-only-untagged-versions: false
-         token: ${{ secrets.GH_PAT }}
+        #  min-versions-to-keep: 0
+        #  delete-only-untagged-versions: false
+        #  token: ${{ secrets.GH_PAT }}
