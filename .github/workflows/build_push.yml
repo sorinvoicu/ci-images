@@ -147,7 +147,7 @@ jobs:
             PACKAGE_NAME="r_4.3.2_cran_2024.01.12"
 
             # Get today's date
-            TODAY=$(date -u --date="yesterday" +"%Y-%m-%d")
+            TODAY=$(date --date="yesterday" +"%Y-%m-%d")
 
             # Fetch all package versions
             VERSIONS=$(curl -s -H "Accept: application/vnd.github+json" \
