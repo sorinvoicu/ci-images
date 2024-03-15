@@ -185,10 +185,15 @@ jobs:
     if: github.ref_name == 'main'
     needs: build_publish
 
+    name: Package maintenance
+    runs-on: ubuntu-latest
+    
     permissions:
       packages: write
     
-    uses: actions/delete-package-versions@v5
-    with:
-      package-name: ${{ needs.build_publish.outputs.IMAGE }}
-      min-versions-to-keep: 2
+    steps:
+     - name: Clean old artifacts
+       uses: actions/delete-package-versions@v5
+       with:
+         package-name: ${{ needs.build_publish.outputs.IMAGE }}
+         min-versions-to-keep: 2
