@@ -147,7 +147,7 @@ jobs:
             PACKAGE_NAME="r_4.3.2_cran_2024.01.12"
 
             # Get today's date
-            TODAY=$(date --date="yesterday" +"%Y-%m-%d")
+            TODAY=$(date +"%Y-%m-%d")
 
             # Fetch all package versions
             VERSIONS=$(curl -s -H "Accept: application/vnd.github+json" \
@@ -163,7 +163,7 @@ jobs:
               VERSION_ID=$(echo $VERSION | jq -r '.id')
 
               # If the creation date is not today, delete the version
-              if [ "$CREATED_AT" != "$TODAY" ]
+              if [ "$CREATED_AT" < "$TODAY" ]
               then
                 curl -s -X DELETE -H "Accept: application/vnd.github+json" \
                 -H "Authorization: Bearer $TOKEN" \
