@@ -21,6 +21,7 @@ RUN /rocker_scripts/install_R_source.sh && \
     /rocker_scripts/setup_R.sh && \
     /rocker_scripts/install_pandoc.sh && \
     /rocker_scripts/install_quarto.sh && \
+    /rocker_scripts/install_texlive.sh && \
     /rocker_scripts/install_tidyverse.sh
 
 COPY scripts /scripts

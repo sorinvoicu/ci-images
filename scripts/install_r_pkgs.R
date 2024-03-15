@@ -10,7 +10,9 @@ install_pkgs <- c(
   "golem",
   "shinymeta",
   "shinyjs",
-  "AzureAuth"
+  "AzureAuth",
+  "pharmaverseadam",
+  "DT"
 )
 
 # Install packages
