@@ -220,7 +220,7 @@ jobs:
         with:
           github-access-token: "${{ secrets.GH_PAT }}"
           org: "${{ github.repository_owner }}"
-          package_name: "${{ github.repository }}"
+          package_name: r_4.3.2_cran_2024.01.12
           package_type: "container"   # Default is container because the action was design only for containers at first
           selector: |
               type=tagCount;operator=greaterThan;value=0
