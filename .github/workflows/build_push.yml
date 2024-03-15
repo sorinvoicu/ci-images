@@ -191,7 +191,7 @@ jobs:
     runs-on: ubuntu-latest
     
     permissions:
-      packages: admin
+      packages: write
     
     steps:
      - name: Clean old artifacts
