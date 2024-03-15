@@ -214,17 +214,27 @@ jobs:
       permissions:
         packages: write
       
+
       steps:
-      - name: Clean GHCR packages
-        uses: cresh-io/action-ghcr-batch-delete-versions@v1
-        with:
-          github-access-token: "${{ secrets.GH_PAT }}"
-          org: "${{ github.repository_owner }}"
-          package_name: package/r_4.3.2_cran_2024.01.12
-          package_type: "container"   # Default is container because the action was design only for containers at first
-          selector: |
-              type=tagCount;operator=greaterThan;value=0
-              type=tags;operator=startsWith;value=pr-1-
-          excluder: |
-              type=tags;operator=equals;value=pr-1-ee20adc
-          dry-run: "0"
+        - name: Fetch releases
+          run: |
+            curl -X POST \
+              -s \
+              -H "Accept: application/vnd.github.package-deletes-preview+json" \
+              -H "Authorization: bearer ${{ secrets.GH_PAT }}" \
+              -d '{"query":"query {repository(owner:\"sorinvoicu\", name:\"ci-images\") {registryPackages(last:1) {edges{node{id, name, versions(last:100){edges {node {id, updatedAt, version}}}}}}}}"}' \
+              -o /tmp/response.json \
+              --url https://api.github.com/graphql
+
+        - name: Filter Releases
+          run: "cat /tmp/response.json | jq -r 'def daysAgo(days): (now | floor) - (days * 86400); [.data.repository.registryPackages.edges[0].node.versions.edges | sort_by(.node.updatedAt|fromdate) | reverse | .[] | select( .node.version != \"docker-base-layer\" ) | .value[].node.id] | unique_by(.) | @csv'  | cut -d, -f1  | sed -e 's/^\"//' -e 's/\"$//' > /tmp/release.json"
+        - name: Show Release
+          id: release
+          run: printf "::set-output name=id::%s" $(cat /tmp/release.json)
+        - name: Delete Release
+          uses: WyriHaximus/github-action-delete-package@master
+          if: steps.release.outputs.id != ''
+          with:
+            packageVersionId: ${{ steps.release.outputs.id }}
+          env:
+            GITHUB_TOKEN: ${{ secrets.GH_PAT }}
