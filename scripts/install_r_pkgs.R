@@ -12,7 +12,9 @@ install_pkgs <- c(
   "shinyjs",
   "AzureAuth",
   "pharmaverseadam",
-  "DT"
+  "DT",
+  "openxlsx",
+  "shinyFeedback"
 )
 
 # Install packages
