@@ -12,13 +12,15 @@ install_pkgs <- c(
   "shinyjs",
   "AzureAuth",
   "pharmaverseadam",
-  "DT"
+  "DT",
+  "openxlsx",
+  "shinyFeedback"
 )
 
 # Install packages
 pak::pak(
-  pkg = install_pkgs, 
-  dependencies = TRUE, 
-  ask = FALSE, 
+  pkg = install_pkgs,
+  dependencies = TRUE,
+  ask = FALSE,
   upgrade = FALSE
 )
