@@ -19,8 +19,8 @@ install_pkgs <- c(
 
 # Install packages
 pak::pak(
-  pkg = install_pkgs, 
-  dependencies = TRUE, 
-  ask = FALSE, 
+  pkg = install_pkgs,
+  dependencies = TRUE,
+  ask = FALSE,
   upgrade = FALSE
 )
