@@ -3,6 +3,7 @@ set -e
 
 # List of system dependencies
 pkgs_to_install="\
+curl \
 lbzip2 \
 rsync \
 qpdf \
