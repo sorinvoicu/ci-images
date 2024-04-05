@@ -9,6 +9,7 @@ rsync \
 qpdf \
 "
 apt-get update -y
+# shellcheck disable=SC2086
 apt-get install -q -y ${pkgs_to_install}
 
 # Clean up
