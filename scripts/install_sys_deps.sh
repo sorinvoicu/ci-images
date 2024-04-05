@@ -6,6 +6,7 @@ pkgs_to_install="\
 lbzip2 \
 rsync \
 qpdf \
+lychee \
 "
 apt-get update -y
 apt-get install -q -y ${pkgs_to_install}
