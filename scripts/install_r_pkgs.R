@@ -5,8 +5,15 @@ install.packages("pak")
 
 # Packages to install
 install_pkgs <- c(
-  "shinytest2",
+  "boehringer-ingelheim/davinci",
+  "rcmdcheck",
+  "roxygen2",
   "lintr",
+  "pkgdown",
+  "rmarkdown",
+  "devtools",
+  "pharmaverseadam",
+  "shinytest2",
   "golem",
   "shinymeta",
   "shinyjs",
@@ -24,3 +31,6 @@ pak::pak(
   ask = FALSE,
   upgrade = FALSE
 )
+
+# Remove DaVinci packages from image
+grep("^dv.", rownames(installed.packages()), value = TRUE) |> sapply(remove.packages)
