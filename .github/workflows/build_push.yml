@@ -37,8 +37,11 @@ on:
       cran_snapshot_date:
         description: CRAN packages snapshot date (YYYY-MM-DD)
         required: true
+        type: choice
         default: "2024-01-12"
-        type: string
+        options:
+          - "2024-01-12"
+          - "latest"
       custom_tag:
         description: Custom image tag
         required: false
