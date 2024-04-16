@@ -19,4 +19,4 @@ apt-get autoclean -y
 rm -rf /var/lib/apt/lists/*
 
 # Install lychee URL checker
-curl -Ls https://github.com/lycheeverse/lychee/releases/download/v${LYCHEE_VERSION}/lychee-v${LYCHEE_VERSION}-$(arch)-unknown-linux-gnu.tar.gz | tar xz -C /usr/local/bin
+curl -Ls "https://github.com/lycheeverse/lychee/releases/download/v${LYCHEE_VERSION}/lychee-v${LYCHEE_VERSION}-$(arch)-unknown-linux-gnu.tar.gz" | tar xz -C /usr/local/bin
