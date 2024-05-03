@@ -14,9 +14,9 @@ on:
         description: R Version
         required: true
         type: choice
-        default: "4.3.2"
+        default: "4.4.0"
         options:
-          - "4.3.2"
+          - "4.4.0"
           - "latest"
       quarto_version:
         description: Quarto version
