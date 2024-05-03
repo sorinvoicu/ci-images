@@ -40,6 +40,12 @@
 
 FROM ghcr.io/r-lib/rig/r
 
+# https://github.com/lycheeverse/lychee-action/tags
+ARG LYCHEE_VERSION=0.14.3
+
 COPY scripts /scripts
 RUN /scripts/install_sys_deps.sh && \
     /scripts/install_r_pkgs.R 
+
+
+CMD ["/init"]    

@@ -5,6 +5,7 @@ set -e
 pkgs_to_install="\
 curl \
 lbzip2 \
+rsync \
 qpdf \
 wget \
 "
