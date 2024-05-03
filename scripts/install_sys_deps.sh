@@ -8,6 +8,7 @@ lbzip2 \
 rsync \
 qpdf \
 wget \
+libcurl \
 "
 apt-get update -y
 # shellcheck disable=SC2086
