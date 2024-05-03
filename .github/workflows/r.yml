@@ -24,7 +24,7 @@ jobs:
         with: 
           repository:  ${{ github.event.inputs.repo }}
           path: .
-          ref: master
+          ref: main
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@f57f1301a053485946083d7a45022b278929a78a
         with:
