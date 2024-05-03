@@ -5,10 +5,8 @@ set -e
 pkgs_to_install="\
 curl \
 lbzip2 \
-rsync \
 qpdf \
 wget \
-libcurl4-openssl-dev \
 "
 apt-get update -y
 # shellcheck disable=SC2086
