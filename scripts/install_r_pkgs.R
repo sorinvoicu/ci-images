@@ -9,6 +9,8 @@ install_pkgs <- c(
   "boehringer-ingelheim/davinci",
   "rcmdcheck",
   "roxygen2",
+  "pkgdown",
+  "styler",
   "lintr",
   "pkgdown",
   "rmarkdown",
