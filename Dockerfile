@@ -29,8 +29,8 @@ RUN /rocker_scripts/install_R_source.sh && \
     /rocker_scripts/install_texlive.sh
 
 COPY scripts /scripts
-# RUN /scripts/install_sys_deps.sh && \
-#     /scripts/install_r_pkgs.R 
+RUN /scripts/install_sys_deps.sh && \
+    /scripts/install_r_pkgs.R 
 
 # Cleanup
 RUN rm -rf /rocker_scripts /scripts 
