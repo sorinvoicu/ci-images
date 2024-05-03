@@ -1,10 +1,7 @@
 #!/usr/bin/env Rscript
 
 # Get pak package via normal route
-install.packages("pak")
-# install.packages("shinytest2")
-# install.packages("purrr")
-
+install.packages("pak", repos="https://r-lib.github.io/p/pak/dev/")
 
 # Packages to install
 install_pkgs <- c(
