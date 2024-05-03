@@ -40,7 +40,7 @@
 
 FROM ghcr.io/r-lib/rig/r
 
-rig system setup-user-lib 
+RUN rig system setup-user-lib 
 
 # https://github.com/lycheeverse/lychee-action/tags
 ARG LYCHEE_VERSION=0.14.3
