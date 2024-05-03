@@ -2,6 +2,7 @@
 
 # Get pak package via normal route
 install.packages("pak")
+install.packages("shinytest2")
 
 # Packages to install
 install_pkgs <- c(
@@ -13,7 +14,7 @@ install_pkgs <- c(
   "rmarkdown",
   "devtools",
   "pharmaverseadam",
-  "shinytest2",
+  # "shinytest2",
   "golem",
   "shinymeta",
   "shinyjs",
