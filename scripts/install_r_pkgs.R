@@ -3,7 +3,6 @@
 # Get pak package via normal route
 install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
 
-install.packages("readxl")
 
 # Packages to install
 install_pkgs <- c(
@@ -30,12 +29,14 @@ install_pkgs <- c(
 )
 
 # Install packages
-pak::pak(
-  pkg = install_pkgs,
-  dependencies = TRUE,
-  ask = FALSE,
-  upgrade = TRUE
-)
+# pak::pak(
+#   pkg = install_pkgs,
+#   dependencies = TRUE,
+#   ask = FALSE,
+#   upgrade = FALSE
+# )
+
+install.packages(install_pkgs)
 
 # Remove DaVinci packages from image
 grep("^dv.", rownames(installed.packages()), value = TRUE) |> sapply(remove.packages)
