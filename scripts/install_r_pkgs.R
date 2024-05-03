@@ -32,7 +32,7 @@ pak::pak(
   pkg = install_pkgs,
   dependencies = TRUE,
   ask = FALSE,
-  upgrade = FALSE
+  upgrade = TRUE
 )
 
 # Remove DaVinci packages from image
