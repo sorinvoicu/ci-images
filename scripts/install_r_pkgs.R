@@ -3,6 +3,8 @@
 # Get pak package via normal route
 install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
 
+install.packages("readxl")
+
 # Packages to install
 install_pkgs <- c(
   "r-lib/pkgdepends",
