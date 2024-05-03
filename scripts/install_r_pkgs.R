@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
 
 # Get pak package via normal route
-install.packages("pak", repos="https://r-lib.github.io/p/pak/dev/")
+install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
+install.packages("pkgdepends", repos = "https://r-lib.github.io/p/pkgdepends/dev/")
 
 # Packages to install
 install_pkgs <- c(
