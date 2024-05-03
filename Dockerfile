@@ -38,7 +38,7 @@
 # CMD ["/init"]
 
 
-FROM ghcr.io/r-lib/rig/r
+FROM rocker/r-ver:latest
 
 # https://github.com/lycheeverse/lychee-action/tags
 ARG LYCHEE_VERSION=0.14.3
