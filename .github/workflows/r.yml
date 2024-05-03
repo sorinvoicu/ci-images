@@ -1,0 +1,39 @@
+name: R
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: Repo
+        required: true
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        r-version: ['4.4.0']
+
+    steps:
+      - name: Checkout BI project ⬇️
+        uses: actions/checkout@v4
+        with: 
+          repository:  ${{ github.event.inputs.repo }}
+          path: .
+          ref: master
+      - name: Set up R ${{ matrix.r-version }}
+        uses: r-lib/actions/setup-r@f57f1301a053485946083d7a45022b278929a78a
+        with:
+          r-version: ${{ matrix.r-version }}
+      - name: Install dependencies
+        run: |
+          install.packages(c("remotes", "rcmdcheck"))
+          remotes::install_deps(dependencies = TRUE)
+        shell: Rscript {0}
+      - name: Check
+        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+        shell: Rscript {0}
